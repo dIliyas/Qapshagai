@@ -1045,11 +1045,28 @@ function cd(){
 }
 
 // ── INIT ──
-window.addEventListener('load',()=>{
-  setTimeout(()=>{
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  // Разблокируем AudioContext через реальное взаимодействие
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  ctx.resume().then(() => ctx.close());
+  // Убираем гейт
+  const gate = document.getElementById('audio-gate');
+  gate.style.opacity = '0';
+  gate.style.transition = 'opacity .6s ease';
+  setTimeout(() => gate.remove(), 700);
+  // Показываем лоадер и запускаем сайт
+  setTimeout(() => {
     document.getElementById('intro').classList.add('hidden');
-    setTimeout(initScrollMusic,400);
-  },2300);
+    setTimeout(initScrollMusic, 400);
+  }, 2300);
+}
+
+window.addEventListener('load', () => {
+  // Ничего не делаем — ждём клика на гейте
 });
 
 stars();parts();render();cd();initNextBday();renderMemories();loadWeather();
