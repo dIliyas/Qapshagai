@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QAPSHAGAI 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#7eb8d4;--silver:#b0b8c8;--dark:#07090d;--text:#e8e4dc}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden}
+
+/* ── SCROLL PROGRESS ── */
+#scroll-progress{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(to right,var(--accent),#40e8b0);z-index:9000;pointer-events:none;transition:width .1s linear}
+
+/* LOADER */
+#intro{position:fixed;inset:0;background:#000;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .9s ease,visibility .9s ease}
+#intro.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loader-text{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,8vw,6rem);letter-spacing:.2em;font-weight:900;animation:lpulse 1.5s ease-in-out infinite;text-transform:uppercase}
+.loader-sub{font-size:.58rem;letter-spacing:.45em;color:var(--silver);margin-top:.8rem;opacity:.45}
+.loader-bar{width:180px;height:1px;background:rgba(255,255,255,.08);margin-top:3rem;overflow:hidden}
+.loader-bar::after{content:'';display:block;width:100%;height:100%;background:var(--accent);transform:translateX(-100%);animation:lslide 2s ease forwards}
+@keyframes lslide{to{transform:translateX(0)}}
+@keyframes lpulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* HERO */
+#hero{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 15% 40%,rgba(80,140,200,.1) 0%,transparent 55%),radial-gradient(ellipse at 85% 65%,rgba(100,70,200,.08) 0%,transparent 50%),radial-gradient(ellipse at 50% 95%,rgba(0,160,120,.06) 0%,transparent 45%),linear-gradient(160deg,#080c18 0%,#050810 50%,#080610 100%)}
+
+/* Ambient video — раскомментируй когда добавишь hero-bg.mp4 */
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.5s ease;z-index:0}
+.hero-video.loaded{opacity:.4}
+
+.hero-stars{position:absolute;inset:0;overflow:hidden;z-index:1}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.8}}
+.hero-lines{position:absolute;inset:0;z-index:1;background-image:linear-gradient(rgba(126,184,212,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(126,184,212,.025) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse at center,black 15%,transparent 70%)}
+.hero-particles{position:absolute;inset:0;overflow:hidden;z-index:1}
+.particle{position:absolute;width:1px;height:80px;background:linear-gradient(to bottom,transparent,rgba(126,184,212,.35),transparent);animation:shootStar linear infinite;opacity:0}
+@keyframes shootStar{0%{transform:translateY(-100px) rotate(10deg);opacity:0}5%{opacity:1}95%{opacity:.2}100%{transform:translateY(110vh) rotate(10deg);opacity:0}}
+
+.hero-eyebrow{position:relative;z-index:2;font-size:.55rem;letter-spacing:.55em;color:var(--accent);opacity:0;animation:fadeUp 1s ease .6s forwards;text-transform:uppercase;margin-bottom:2rem}
+.hero-title{position:relative;z-index:2;font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,13vw,12rem);font-weight:900;line-height:.88;text-align:center;letter-spacing:.08em;opacity:0;animation:fadeUp 1.4s ease .9s forwards;text-transform:uppercase}
+.hero-title em{font-style:italic;color:var(--accent);font-family:'Cormorant Garamond',serif;font-size:.7em;font-weight:300;letter-spacing:.02em;display:block;margin-top:.1em}
+.hero-subtitle{position:relative;z-index:2;font-family:'Bebas Neue';font-size:clamp(.9rem,2.5vw,1.8rem);letter-spacing:.75em;color:rgba(126,184,212,.45);margin-top:1.5rem;opacity:0;animation:fadeUp 1s ease 1.3s forwards}
+.hero-invite{position:relative;z-index:2;max-width:400px;text-align:center;font-family:'Cormorant Garamond';font-style:italic;font-size:1.15rem;color:rgba(255,255,255,.32);line-height:1.75;margin-top:2.5rem;opacity:0;animation:fadeUp 1s ease 1.6s forwards}
+.hero-cta{position:relative;z-index:2;margin-top:3.5rem;opacity:0;animation:fadeUp 1s ease 1.9s forwards;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.btn-primary{display:inline-flex;align-items:center;gap:.7rem;background:var(--accent);color:#000;padding:.9rem 2.2rem;font-family:'Space Mono';font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;border:none;cursor:pointer;transition:all .3s}
+.btn-primary:hover{background:#a8d4e8;transform:translateY(-2px)}
+.btn-secondary{display:inline-flex;align-items:center;gap:.7rem;background:transparent;border:1px solid rgba(126,184,212,.22);color:rgba(255,255,255,.45);padding:.9rem 2.2rem;font-family:'Space Mono';font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;transition:all .3s}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.arrow{font-size:.85rem;transition:transform .3s}
+.btn-primary:hover .arrow{transform:translateX(4px)}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;animation:fadeUp 1s ease 2.5s forwards;z-index:5}
+.scroll-hint span{font-size:.48rem;letter-spacing:.4em;color:rgba(255,255,255,.18)}
+.scroll-mouse{width:20px;height:30px;border:1px solid rgba(255,255,255,.13);border-radius:10px;position:relative}
+.scroll-mouse::after{content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);width:2px;height:6px;background:var(--accent);border-radius:1px;animation:sdot 1.8s ease-in-out infinite}
+@keyframes sdot{0%{top:5px;opacity:1}100%{top:16px;opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+
+/* NEXT BIRTHDAY */
+#next-bday-banner{max-width:700px;margin:0 auto 2rem;padding:.9rem 1.5rem;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:1rem}
+.nbb-icon{font-size:1.4rem}
+.nbb-text{font-size:.55rem;letter-spacing:.15em;color:rgba(255,255,255,.35);text-transform:uppercase}
+.nbb-name{font-family:'Cormorant Garamond';font-style:italic;font-size:1.1rem;color:#fff;margin-top:.1rem}
+.nbb-days{margin-left:auto;font-family:'Bebas Neue';font-size:1.6rem;color:var(--accent)}
+.nbb-days-label{font-size:.4rem;letter-spacing:.3em;color:rgba(255,255,255,.2);text-align:right;margin-top:.1rem;text-transform:uppercase}
+
+/* PERSONAS */
+#personas{position:relative;z-index:2}
+.personas-header{text-align:center;padding:5rem 2rem 2rem}
+.eyebrow{font-size:.52rem;letter-spacing:.55em;color:var(--accent);margin-bottom:1rem;text-transform:uppercase;display:block}
+.personas-header h2{font-family:'Cormorant Garamond';font-size:clamp(2rem,5vw,4rem);font-weight:300;font-style:italic}
+.photo-fmt-box{max-width:700px;margin:2rem auto 3rem;border:1px solid rgba(255,255,255,.06);padding:1.5rem 2rem;background:rgba(255,255,255,.02)}
+.fmt-title{font-size:.5rem;letter-spacing:.4em;color:var(--accent);margin-bottom:1rem;text-transform:uppercase}
+.fmt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem}
+.fmt-item{font-size:.72rem;color:rgba(255,255,255,.38);line-height:1.6}
+.fmt-item strong{display:block;color:rgba(255,255,255,.65);margin-bottom:.2rem}
+
+/* PERSONA SLIDE */
+.persona-slide{display:flex;min-height:100vh;position:relative}
+.persona-photo-col{width:45vw;position:sticky;top:0;height:100vh;flex-shrink:0;overflow:hidden}
+.persona-photo-inner{position:absolute;inset:0;background-size:cover;background-position:center top}
+.persona-ph-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+.ph-num{font-family:'Bebas Neue';font-size:clamp(6rem,15vw,14rem);color:rgba(255,255,255,.04);line-height:1}
+.ph-lbl{font-size:.52rem;letter-spacing:.35em;color:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.05);padding:.5rem 1.2rem;text-transform:uppercase}
+.photo-vignette{position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,rgba(7,9,13,1) 100%),linear-gradient(to bottom,rgba(7,9,13,.35) 0%,transparent 20%,transparent 80%,rgba(7,9,13,.5) 100%);z-index:1}
+
+/* SMOKE */
+.smoke-wrap{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.smoke{position:absolute;border-radius:50%;background:radial-gradient(ellipse,rgba(180,210,255,.06) 0%,transparent 70%);animation:smokeFloat ease-in-out infinite}
+@keyframes smokeFloat{0%{transform:translateY(0) scale(1);opacity:0}20%{opacity:1}80%{opacity:.25}100%{transform:translateY(-50%) scale(2.2);opacity:0}}
+
+.persona-info-col{flex:1;padding:4rem 3rem 4rem 4rem;position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center}
+.p-num{font-family:'Bebas Neue';font-size:5rem;color:rgba(255,255,255,.04);line-height:1;margin-bottom:-1.5rem}
+.p-lastname{font-size:.5rem;letter-spacing:.55em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.3rem}
+.p-firstname{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;color:#fff;line-height:1;font-style:italic}
+.p-role{margin-top:.8rem;display:inline-flex;align-items:center;font-size:.52rem;letter-spacing:.25em;text-transform:uppercase;padding:.3rem .8rem;border:1px solid var(--p-color);color:var(--p-color)}
+
+/* TYPEWRITER QUOTE */
+.p-quote{font-family:'Cormorant Garamond';font-style:italic;font-size:1.05rem;color:rgba(255,255,255,.3);line-height:1.7;margin-top:1.8rem;padding-left:1rem;border-left:1px solid var(--p-color);min-height:2.2rem}
+.tw-cursor{display:inline-block;width:1px;height:.9em;background:var(--p-color);margin-left:2px;animation:twBlink .7s infinite;vertical-align:text-bottom}
+@keyframes twBlink{0%,100%{opacity:1}50%{opacity:0}}
+
+.p-stats{margin-top:2rem;display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05)}
+.stat-item{background:rgba(0,0,0,.45);padding:.85rem 1rem}
+.stat-lbl{font-size:.44rem;letter-spacing:.3em;color:rgba(255,255,255,.18);text-transform:uppercase;margin-bottom:.3rem}
+.stat-val{font-size:.78rem;color:rgba(255,255,255,.6)}
+
+/* BIRTHDAY */
+.p-birthday{margin-top:1.4rem;display:flex;align-items:center;gap:1.2rem;padding:.8rem 1rem;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02)}
+.bday-left{display:flex;flex-direction:column;gap:.2rem}
+.bday-label{font-size:.43rem;letter-spacing:.35em;color:rgba(255,255,255,.2);text-transform:uppercase}
+.bday-date{font-family:'Cormorant Garamond';font-size:1.1rem;font-weight:300;color:rgba(255,255,255,.7)}
+.bday-sign{font-size:1.4rem;line-height:1}
+.bday-right{margin-left:auto;text-align:right}
+.bday-until-label{font-size:.43rem;letter-spacing:.3em;color:rgba(255,255,255,.18);text-transform:uppercase;margin-bottom:.2rem}
+.bday-until-val{font-family:'Bebas Neue';font-size:1.3rem;letter-spacing:.05em;color:var(--p-color)}
+
+/* GALLERY */
+.p-gallery{margin-top:1.5rem;position:relative;overflow:hidden}
+.gallery-track{display:flex;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
+.gallery-slide{min-width:100%;aspect-ratio:4/3;background-size:cover;background-position:center;position:relative;overflow:hidden;flex-shrink:0}
+.gallery-slide-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem}
+.gph-num{font-family:'Bebas Neue';font-size:3rem;color:rgba(255,255,255,.06)}
+.gph-lbl{font-size:.44rem;letter-spacing:.3em;color:rgba(255,255,255,.1);text-transform:uppercase}
+.gallery-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 50%)}
+.gallery-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .25s;z-index:5;backdrop-filter:blur(6px)}
+.gallery-nav:hover{background:rgba(0,0,0,.8);color:#fff;border-color:var(--p-color)}
+.gallery-prev{left:.6rem}.gallery-next{right:.6rem}
+.gallery-dots{display:flex;gap:5px;justify-content:center;margin-top:.6rem}
+.gallery-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:all .3s}
+.gallery-dot.active{background:var(--p-color);transform:scale(1.3)}
+.gallery-counter{position:absolute;bottom:.7rem;right:.8rem;font-size:.48rem;letter-spacing:.25em;color:rgba(255,255,255,.4);z-index:5}
+
+/* MEME */
+.p-meme{margin-top:1.5rem;padding:1rem 1.2rem;background:rgba(255,255,255,.025);border-left:2px solid var(--p-color);position:relative}
+.meme-icon{position:absolute;top:-.6rem;left:.8rem;font-size:1.2rem;line-height:1;background:var(--dark);padding:0 .3rem}
+.meme-label{font-size:.42rem;letter-spacing:.35em;color:rgba(255,255,255,.18);text-transform:uppercase;margin-bottom:.5rem}
+.meme-text{font-family:'Cormorant Garamond';font-style:italic;font-size:1rem;line-height:1.6;color:rgba(255,255,255,.55)}
+
+.p-vibes{margin-top:1.5rem;display:flex;gap:.4rem;flex-wrap:wrap}
+.vibe-tag{font-size:.47rem;letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(255,255,255,.07);padding:.25rem .6rem;color:rgba(255,255,255,.22);transition:all .3s}
+.persona-slide:hover .vibe-tag{border-color:var(--p-color);color:var(--p-color)}
+.p-actions{margin-top:2rem;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+.btn-play{display:flex;align-items:center;gap:.5rem;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);padding:.55rem 1.1rem;font-family:'Space Mono';font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .3s}
+.btn-play:hover,.btn-play.active{border-color:var(--p-color);color:var(--p-color)}
+.bars{display:flex;gap:2px;align-items:flex-end;height:12px}
+.bar{width:2px;background:currentColor;border-radius:1px}
+.bar:nth-child(1){height:5px;animation:b .7s infinite}.bar:nth-child(2){height:10px;animation:b .7s infinite .15s}.bar:nth-child(3){height:7px;animation:b .7s infinite .3s}
+@keyframes b{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.3)}}
+.btn-lyrics-link{background:none;border:none;color:rgba(255,255,255,.18);font-family:'Space Mono';font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:color .3s;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(255,255,255,.07)}
+.btn-lyrics-link:hover{color:var(--silver)}
+.like-btn{background:none;border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.18);font-family:'Space Mono';font-size:.52rem;letter-spacing:.15em;padding:.55rem .9rem;cursor:pointer;transition:all .3s}
+.like-btn:hover,.like-btn.liked{border-color:#e88;color:#e88}
+.like-btn.liked{background:rgba(255,100,100,.07)}
+
+/* VISUALIZER */
+.visualizer{display:flex;align-items:flex-end;gap:2px;height:28px;margin-top:1.2rem;opacity:0;transition:opacity .6s}
+.visualizer.active{opacity:1}
+.vbar{width:3px;border-radius:2px;background:var(--p-color);min-height:3px;transition:height .08s ease}
+
+/* TRACK NAME — SPOTIFY STYLE */
+.track-display{margin-top:.8rem;height:1.3rem;overflow:hidden;position:relative}
+.track-name{font-size:.5rem;letter-spacing:.18em;color:rgba(255,255,255,.25);text-transform:uppercase;position:absolute;left:0;right:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .35s ease}
+.track-name.entering{transform:translateY(100%);opacity:0}
+.track-name.visible{transform:translateY(0);opacity:1}
+.track-name.leaving{transform:translateY(-100%);opacity:0}
+
+/* TRACK PROGRESS BAR */
+.track-progress{margin-top:.5rem;height:2px;background:rgba(255,255,255,.07);overflow:hidden}
+.track-progress-fill{height:100%;width:0%;background:var(--p-color);transition:width .5s linear}
+
+.persona-divider{height:1px;background:linear-gradient(to right,transparent,rgba(126,184,212,.12),transparent)}
+
+/* LYRICS */
+.lyrics-panel{position:fixed;right:0;top:0;height:100vh;width:min(420px,95vw);z-index:500;background:rgba(7,9,13,.92);backdrop-filter:blur(40px);border-left:1px solid rgba(255,255,255,.06);padding:3rem 2.5rem;overflow-y:auto;transform:translateX(110%);transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.lyrics-panel.open{transform:translateX(0)}
+.lyrics-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:rgba(255,255,255,.22);font-size:1rem;cursor:pointer;transition:color .3s}
+.lyrics-close:hover{color:#fff}
+.l-song{font-family:'Cormorant Garamond';font-size:1.7rem;font-weight:300;font-style:italic;margin-bottom:.3rem}
+.l-by{font-size:.5rem;letter-spacing:.35em;color:var(--accent);margin-bottom:2.5rem;text-transform:uppercase}
+.l-body{font-family:'Cormorant Garamond';font-size:1.05rem;line-height:2.1;color:rgba(255,255,255,.55);white-space:pre-line}
+.l-note{margin-top:2rem;font-size:.44rem;letter-spacing:.2em;color:rgba(255,255,255,.1);border-top:1px solid rgba(255,255,255,.04);padding-top:1.5rem;text-transform:uppercase}
+
+#now-playing{position:fixed;bottom:1.5rem;left:1.5rem;z-index:100;font-size:.47rem;letter-spacing:.2em;color:rgba(255,255,255,.18);display:flex;align-items:center;gap:.5rem}
+.np-dot{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:npblink 2s infinite}
+@keyframes npblink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* ROUTE */
+#route{position:relative;z-index:2;padding:6rem 2rem 5rem;overflow:hidden}
+.route-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(64,232,176,.05) 0%,transparent 65%),linear-gradient(180deg,#07090d 0%,#040608 100%)}
+.route-inner{max-width:860px;margin:0 auto;position:relative;z-index:1}
+.route-title{font-family:'Cormorant Garamond';font-size:clamp(2rem,5vw,4rem);font-weight:300;text-align:center;margin-bottom:.5rem}
+.route-title em{font-style:normal;color:var(--accent)}
+.route-sub{text-align:center;font-size:.55rem;letter-spacing:.4em;color:rgba(255,255,255,.2);margin-bottom:3rem;text-transform:uppercase}
+.map-wrap{border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.015);padding:1.5rem;margin-bottom:2.5rem;position:relative;overflow:hidden}
+.route-map{width:100%;height:auto;display:block}
+.route-stops{display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.stop-card{flex:1;min-width:140px;max-width:200px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);padding:1.2rem 1rem;text-align:center;transition:all .3s}
+.stop-card:hover{border-color:rgba(126,184,212,.3);background:rgba(126,184,212,.04);transform:translateY(-3px)}
+.stop-card-dest{border-color:rgba(64,232,176,.2)}
+.stop-card-dest:hover{border-color:rgba(64,232,176,.5);background:rgba(64,232,176,.04)}
+.stop-icon{font-size:1.6rem;margin-bottom:.5rem}
+.stop-name{font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:.08em;color:#fff;margin-bottom:.4rem}
+.stop-desc{font-size:.6rem;color:rgba(255,255,255,.25);line-height:1.6;letter-spacing:.05em}
+.stop-arrow{font-size:1.2rem;color:rgba(126,184,212,.3);flex-shrink:0}
+
+/* GUESTBOOK */
+#guestbook{position:relative;z-index:2;padding:5rem 2rem;background:linear-gradient(180deg,#040608 0%,#07090d 100%)}
+.gb-inner{max-width:700px;margin:0 auto}
+.gb-header{text-align:center;margin-bottom:3rem}
+.gb-header h2{font-family:'Cormorant Garamond';font-style:italic;font-size:clamp(2rem,5vw,3.5rem);font-weight:300}
+.gb-form{display:flex;flex-direction:column;gap:.8rem;margin-bottom:3rem}
+.gb-row{display:flex;gap:.8rem}
+.gb-input,.gb-select,.gb-textarea{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--text);font-family:'Space Mono';font-size:.55rem;letter-spacing:.1em;padding:.8rem 1rem;outline:none;transition:border-color .3s;resize:none}
+.gb-input:focus,.gb-select:focus,.gb-textarea:focus{border-color:var(--accent)}
+.gb-input{flex:1}.gb-select{min-width:110px;cursor:pointer}
+.gb-select option{background:#07090d}
+.gb-textarea{min-height:90px;width:100%}
+.gb-submit{align-self:flex-end;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'Space Mono';font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;padding:.7rem 1.8rem;cursor:pointer;transition:all .3s}
+.gb-submit:hover{background:var(--accent);color:#000}
+.gb-entries{display:flex;flex-direction:column;gap:1rem}
+.gb-entry{padding:1.2rem 1.4rem;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);animation:fadeUp .4s ease}
+.gb-entry-head{display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem}
+.gb-entry-name{font-family:'Cormorant Garamond';font-size:1.1rem;font-style:italic}
+.gb-entry-emoji{font-size:1.1rem}
+.gb-entry-time{margin-left:auto;font-size:.43rem;letter-spacing:.15em;color:rgba(255,255,255,.18)}
+.gb-entry-text{font-size:.65rem;color:rgba(255,255,255,.45);line-height:1.7}
+.gb-empty{font-family:'Cormorant Garamond';font-style:italic;color:rgba(255,255,255,.2);font-size:1rem;text-align:center;padding:2rem}
+
+/* WEATHER WIDGET */
+.weather-widget{max-width:500px;margin:0 auto 3rem;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:1.5rem 2rem;display:flex;align-items:center;gap:1.5rem}
+.weather-icon{font-size:2.5rem;line-height:1}
+.weather-info{flex:1}
+.weather-label{font-size:.47rem;letter-spacing:.4em;color:var(--accent);text-transform:uppercase;margin-bottom:.4rem}
+.weather-temp{font-family:'Bebas Neue';font-size:2rem;color:#fff;line-height:1}
+.weather-desc{font-family:'Cormorant Garamond';font-style:italic;font-size:.95rem;color:rgba(255,255,255,.4);margin-top:.2rem}
+.weather-extra{text-align:right;font-size:.55rem;color:rgba(255,255,255,.3);line-height:1.8}
+.weather-extra span{color:rgba(255,255,255,.55)}
+.weather-loading{font-family:'Cormorant Garamond';font-style:italic;color:rgba(255,255,255,.2);font-size:.9rem}
+
+/* MEMORIES */
+#memories{position:relative;z-index:2;padding:5rem 2rem;background:linear-gradient(180deg,#040608 0%,#07090d 100%)}
+.mem-inner{max-width:1000px;margin:0 auto}
+.mem-header{text-align:center;margin-bottom:3rem}
+.mem-header h2{font-family:'Cormorant Garamond';font-style:italic;font-size:clamp(2rem,5vw,3.5rem);font-weight:300}
+.mem-header p{font-size:.6rem;letter-spacing:.2em;color:rgba(255,255,255,.25);margin-top:.8rem}
+.mem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+.mem-card{aspect-ratio:4/5;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.06);background-size:cover;background-position:center;cursor:pointer;transition:transform .4s ease}
+.mem-card:hover{transform:translateY(-4px)}
+.mem-card-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem}
+.mem-ph-icon{font-size:2rem;opacity:.15}
+.mem-ph-lbl{font-size:.42rem;letter-spacing:.3em;color:rgba(255,255,255,.1);text-transform:uppercase}
+.mem-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%);display:flex;align-items:flex-end;padding:.8rem;opacity:0;transition:opacity .3s}
+.mem-card:hover .mem-overlay{opacity:1}
+.mem-overlay-text{font-family:'Cormorant Garamond';font-style:italic;font-size:.8rem;color:rgba(255,255,255,.8)}
+.mem-add-note{text-align:center;margin-top:2rem;font-size:.5rem;letter-spacing:.2em;color:rgba(255,255,255,.15);text-transform:uppercase}
+
+
+#instagram{position:relative;z-index:2;padding:4rem 2rem;text-align:center;border-top:1px solid rgba(255,255,255,.04)}
+.ig-eyebrow{font-size:.5rem;letter-spacing:.55em;color:var(--accent);text-transform:uppercase;margin-bottom:1.2rem;display:block}
+.ig-title{font-family:'Cormorant Garamond';font-style:italic;font-size:clamp(1.5rem,4vw,3rem);font-weight:300;margin-bottom:2rem}
+.ig-link{display:inline-flex;align-items:center;gap:.8rem;border:1px solid rgba(255,255,255,.12);padding:1rem 2rem;color:rgba(255,255,255,.55);font-family:'Space Mono';font-size:.58rem;letter-spacing:.2em;text-decoration:none;text-transform:uppercase;transition:all .4s;position:relative;overflow:hidden}
+.ig-link::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(131,58,180,.15),rgba(253,29,29,.1),rgba(252,176,69,.1));opacity:0;transition:opacity .4s}
+.ig-link:hover{border-color:rgba(200,100,200,.4);color:#fff}
+.ig-link:hover::before{opacity:1}
+
+/* FINALE */
+#finale{min-height:100vh;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem;overflow:hidden;z-index:2}
+.finale-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(100,160,220,.07) 0%,transparent 60%),linear-gradient(180deg,#07090d 0%,#030507 100%)}
+.f-eyebrow{font-size:.5rem;letter-spacing:.6em;color:rgba(255,255,255,.18);text-align:center;margin-bottom:1.5rem;text-transform:uppercase}
+.finale-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,16vw,14rem);font-weight:900;line-height:.85;text-align:center;letter-spacing:.06em;text-transform:uppercase}
+.finale-title em{font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:300;-webkit-text-stroke:1px rgba(126,184,212,.35);color:transparent;display:block;font-size:.7em;letter-spacing:.02em}
+.finale-sub{font-family:'Bebas Neue';font-size:clamp(1rem,3vw,2.5rem);letter-spacing:.8em;color:var(--accent);text-align:center;margin-top:1rem;opacity:.55}
+.finale-meta{display:flex;gap:4rem;margin-top:4rem;flex-wrap:wrap;justify-content:center}
+.f-meta{text-align:center}
+.f-meta-label{font-size:.47rem;letter-spacing:.4em;color:var(--accent);text-transform:uppercase;margin-bottom:.4rem}
+.f-meta-val{font-family:'Cormorant Garamond';font-size:1.3rem;font-weight:300}
+.finale-line{width:160px;height:1px;background:linear-gradient(to right,transparent,rgba(126,184,212,.18),transparent);margin:3.5rem auto}
+.finale-desc{font-family:'Cormorant Garamond';font-style:italic;font-size:1.2rem;color:rgba(255,255,255,.32);text-align:center;max-width:440px;line-height:1.8}
+.roster-section{margin-top:4rem;text-align:center}
+.roster-lbl{font-size:.47rem;letter-spacing:.5em;color:rgba(255,255,255,.14);text-transform:uppercase;margin-bottom:1.5rem}
+.roster{display:flex;flex-wrap:wrap;justify-content:center;gap:.2rem 1.5rem;max-width:700px;margin:0 auto}
+.roster-name{font-family:'Cormorant Garamond',serif;font-size:clamp(1.1rem,2.5vw,1.9rem);letter-spacing:.06em;font-weight:400;font-style:italic;color:rgba(255,255,255,.5);transition:color .3s;cursor:default}
+.roster-name:hover{color:var(--accent)}
+.roster-dot{color:rgba(255,255,255,.1);align-self:center}
+
+@media(max-width:768px){
+  .persona-slide{flex-direction:column;min-height:auto}
+  .persona-photo-col{width:100%;height:60vw;position:relative;top:0}
+  .persona-info-col{padding:2rem 1.5rem 3rem}
+  .photo-vignette{background:linear-gradient(to bottom,transparent 55%,rgba(7,9,13,1) 100%)}
+  .hero-invite{display:none}
+  .photo-fmt-box{margin:2rem 1rem 2rem}
+  .finale-meta{gap:2rem}
+}
+</style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<div id="intro">
+  <div class="loader-text">QAPSHAGAI</div>
+  <div class="loader-sub">2 0 2 6 &nbsp;·&nbsp; I N V I T E &nbsp; O N L Y</div>
+  <div class="loader-bar"></div>
+</div>
+
+<div class="lyrics-panel" id="lyricsPanel">
+  <button class="lyrics-close" onclick="closeLyrics()">✕</button>
+  <div class="l-song" id="lSong">—</div>
+  <div class="l-by" id="lBy">—</div>
+  <div class="l-body" id="lBody"></div>
+  <div class="l-note">Текст песни</div>
+</div>
+
+<div id="now-playing"><div class="np-dot"></div><span id="npText">NO TRACK</span></div>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <!-- Ambient video: раскомментируй и положи hero-bg.mp4 рядом с HTML
+  <video class="hero-video" autoplay muted loop playsinline oncanplay="this.classList.add('loaded')">
+    <source src="hero-bg.mp4" type="video/mp4">
+  </video> -->
+  <div class="hero-stars" id="starsWrap"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-particles" id="partsWrap"></div>
+  <div class="hero-eyebrow">Private Group Invite &nbsp;·&nbsp; Summer 2026</div>
+  <h1 class="hero-title">QAPSHAGAI<br><em>2026</em></h1>
+  <div class="hero-subtitle">Л Ю Б И Т Ь &nbsp;·&nbsp; В Е Р И Т Ь &nbsp;·&nbsp; Ж Д А Т Ь</div>
+  <p class="hero-invite">Любовь. Чувства. Воспоминания.<br>Это не просто история — это часть сердца,<br>которую невозможно забыть.</p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('personas').scrollIntoView({behavior:'smooth'})">Кто едет <span class="arrow">↓</span></button>
+    <button class="btn-secondary" onclick="document.getElementById('finale').scrollIntoView({behavior:'smooth'})">О поездке</button>
+  </div>
+  <div class="scroll-hint"><div class="scroll-mouse"></div><span>Scroll</span></div>
+</section>
+
+<section id="personas">
+  <div class="personas-header">
+    <span class="eyebrow">The Company</span>
+    <h2>Люди, которые сделают<br>это легендарным</h2>
+  </div>
+  <div style="padding:0 2rem">
+    <div id="next-bday-banner">
+      <div class="nbb-icon">🎂</div>
+      <div>
+        <div class="nbb-text">Следующий день рождения</div>
+        <div class="nbb-name" id="nbbName">—</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div class="nbb-days" id="nbbDays">—</div>
+        <div class="nbb-days-label" id="nbbLabel">дней</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 2rem">
+    <div class="photo-fmt-box">
+      <div class="fmt-title">📸 Как добавить фото</div>
+      <div class="fmt-grid">
+        <div class="fmt-item"><strong>Ориентация</strong>Вертикальная (портрет)</div>
+        <div class="fmt-item"><strong>Соотношение</strong>4:5 или 9:16</div>
+        <div class="fmt-item"><strong>Разрешение</strong>1080×1350 или 1080×1920</div>
+        <div class="fmt-item"><strong>Стиль</strong>Cinematic / тёмный фон</div>
+        <div class="fmt-item"><strong>Формат</strong>JPG, PNG, WebP</div>
+        <div class="fmt-item"><strong>Как добавить</strong>photo: "путь/фото.jpg" в JS</div>
+      </div>
+    </div>
+  </div>
+  <div id="personasWrap"></div>
+</section>
+
+<section id="route">
+  <div class="route-bg"></div>
+  <div class="route-inner">
+    <!-- WEATHER WIDGET -->
+    <div class="weather-widget" id="weatherWidget">
+      <div class="weather-icon" id="weatherIcon">🌤️</div>
+      <div class="weather-info">
+        <div class="weather-label">Погода в Қапшағай</div>
+        <div class="weather-temp" id="weatherTemp"><span class="weather-loading">Загрузка...</span></div>
+        <div class="weather-desc" id="weatherDesc"></div>
+      </div>
+      <div class="weather-extra" id="weatherExtra"></div>
+    </div>
+
+    <span class="eyebrow" style="display:block;text-align:center;margin-bottom:1rem">Маршрут</span>
+    <h2 class="route-title">Алматы <em>→</em> Қапшағай</h2>
+    <p class="route-sub">~80 км &nbsp;·&nbsp; ~1 час &nbsp;·&nbsp; Прямая дорога</p>
+    <div class="map-wrap">
+      <svg class="route-map" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="mapgrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" fill="none" stroke="rgba(126,184,212,0.04)" stroke-width="1"/></pattern>
+          <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#7eb8d4"/><stop offset="100%" style="stop-color:#40e8b0"/></linearGradient>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3z" fill="url(#routeGrad)"/></marker>
+        </defs>
+        <rect width="800" height="300" fill="url(#mapgrid)"/>
+        <path d="M120,150 Q300,100 460,150 Q580,190 680,150" fill="none" stroke="rgba(126,184,212,0.08)" stroke-width="24" stroke-linecap="round"/>
+        <path id="routeLine" d="M120,150 Q300,100 460,150 Q580,190 680,150" fill="none" stroke="url(#routeGrad)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="700" stroke-dashoffset="700" marker-end="url(#arr)"/>
+        <circle cx="120" cy="150" r="10" fill="rgba(126,184,212,0.15)" stroke="#7eb8d4" stroke-width="1.5"/><circle cx="120" cy="150" r="4" fill="#7eb8d4"/>
+        <circle cx="120" cy="150" r="18" fill="none" stroke="rgba(126,184,212,0.2)" stroke-width="1"><animate attributeName="r" values="10;24;10" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.4;0;0.4" dur="2.5s" repeatCount="indefinite"/></circle>
+        <text x="120" y="128" text-anchor="middle" font-family="Bebas Neue" font-size="12" fill="#7eb8d4" letter-spacing="1">АЛМАТЫ</text>
+        <text x="120" y="140" text-anchor="middle" font-family="Space Mono,monospace" font-size="7" fill="rgba(255,255,255,0.3)">Старт</text>
+        <circle cx="680" cy="150" r="12" fill="rgba(64,232,176,0.12)" stroke="#40e8b0" stroke-width="1.5"/><circle cx="680" cy="150" r="5" fill="#40e8b0"/>
+        <circle cx="680" cy="150" r="20" fill="none" stroke="rgba(64,232,176,0.2)" stroke-width="1"><animate attributeName="r" values="14;28;14" dur="2s" repeatCount="indefinite" begin="0.5s"/><animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite" begin="0.5s"/></circle>
+        <text x="680" y="128" text-anchor="middle" font-family="Bebas Neue" font-size="12" fill="#40e8b0" letter-spacing="1">ҚАПШАҒАЙ</text>
+        <text x="680" y="140" text-anchor="middle" font-family="Space Mono,monospace" font-size="7" fill="rgba(255,255,255,0.3)">Назначение</text>
+        <text x="680" y="172" text-anchor="middle" font-size="16" opacity="0.35">🏖️</text>
+        <rect x="330" y="175" width="140" height="24" rx="2" fill="rgba(255,255,255,0.03)" stroke="rgba(126,184,212,0.12)" stroke-width="1"/>
+        <text x="400" y="191" text-anchor="middle" font-family="Space Mono,monospace" font-size="8" fill="rgba(255,255,255,0.3)" letter-spacing="1">≈ 80 КМ · 1 ЧАС</text>
+      </svg>
+      <script>
+        const rl=document.getElementById('routeLine');
+        new IntersectionObserver(e=>{if(e[0].isIntersecting){rl.style.transition='stroke-dashoffset 2s cubic-bezier(0.4,0,0.2,1)';rl.style.strokeDashoffset='0';}},{threshold:.4}).observe(document.getElementById('route'));
+      </script>
+    </div>
+    <div class="route-stops">
+      <div class="stop-card"><div class="stop-icon">🏙️</div><div class="stop-name">Алматы</div><div class="stop-desc">Сбор компании<br>Выезд утром</div></div>
+      <div class="stop-arrow">→</div>
+      <div class="stop-card"><div class="stop-icon">🛣️</div><div class="stop-name">Трасса А-3</div><div class="stop-desc">Прямая дорога<br>Плейлист в дороге</div></div>
+      <div class="stop-arrow">→</div>
+      <div class="stop-card stop-card-dest"><div class="stop-icon">🌊</div><div class="stop-name">Қапшағай</div><div class="stop-desc">Пляж, солнце<br>Свои люди</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMORIES -->
+<section id="memories">
+  <div class="mem-inner">
+    <div class="mem-header">
+      <span class="eyebrow">Throwback</span>
+      <h2>Как это было раньше</h2>
+      <p>Моменты из прошлых поездок</p>
+    </div>
+    <div class="mem-grid" id="memGrid"></div>
+  </div>
+</section>
+
+<!-- GUESTBOOK -->
+<section id="guestbook">
+  <div class="gb-inner">
+    <div class="gb-header">
+      <span class="eyebrow">Гостевая книга</span>
+      <h2>Оставь пожелание</h2>
+    </div>
+    <div class="gb-form">
+      <div class="gb-row">
+        <input class="gb-input" id="gbName" placeholder="Твоё имя" maxlength="40">
+        <select class="gb-select" id="gbEmoji">
+          <option>❤️</option><option>🔥</option><option>🌊</option>
+          <option>✨</option><option>🎉</option><option>🙏</option>
+          <option>💫</option><option>🫶</option>
+        </select>
+      </div>
+      <textarea class="gb-textarea" id="gbText" placeholder="Напиши что-нибудь тёплое..." maxlength="300"></textarea>
+      <button class="gb-submit" onclick="addGbEntry()">Отправить →</button>
+    </div>
+    <div class="gb-entries" id="gbEntries">
+      <div class="gb-empty">Будь первым — оставь пожелание ✨</div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="finale">
+  <div class="finale-bg"></div>
+  <div class="f-eyebrow">The Destination</div>
+  <h2 class="finale-title">QAPSHAGAI<br><em>2026</em></h2>
+  <div class="finale-sub">Л Ю Б И Т Ь &nbsp;·&nbsp; В Е Р И Т Ь &nbsp;·&nbsp; Ж Д А Т Ь</div>
+  <div class="finale-meta">
+    <div class="f-meta"><div class="f-meta-label">Локация</div><div class="f-meta-val">Қапшағай, Казахстан</div></div>
+    <div class="f-meta"><div class="f-meta-label">Сезон</div><div class="f-meta-val">Лето 2026</div></div>
+    <div class="f-meta"><div class="f-meta-label">Компания</div><div class="f-meta-val" id="countVal">6 человек</div></div>
+    <div class="f-meta"><div class="f-meta-label">До поездки</div><div class="f-meta-val" id="cdVal">—</div></div>
+  </div>
+  <div class="finale-line"></div>
+  <p class="finale-desc">Любовь. Чувства. Воспоминания.<br>Это часть сердца, которую невозможно забыть.</p>
+  <div class="roster-section">
+    <div class="roster-lbl">Участники</div>
+    <div class="roster" id="rosterEl"></div>
+  </div>
+</section>
+
+<script>
+const TRIP_DATE = new Date('2026-07-15');
+
+const personas = [
+  {
+    firstName:"Iliyas", lastName:"DOSSYMBEKULY", role:"Организатор",
+    quote:"Жизнь — это не пункт назначения, это само путешествие",
+    vibes:["Night City","Luxury","Hustler"], color:"#9b8ff0",
+    photo:"photo/iliyas2.jpg",
+    bgGradient:"linear-gradient(145deg,#0d0d22 0%,#1a1060 50%,#2d1a80 100%)",
+    birthday:"22 января 2002", zodiac:"♒ Водолей",
+    galleryBg:["url('photo/iliyas1.jpg') center/cover no-repeat","url('photo/iliyas.jpg') center/cover no-repeat","url('photo/iliyas3.jpg') center/cover no-repeat"],
+    meme:"Я приду, только скажи «придёшь?» — и я уже в такси.",
+    stats:[{label:"На Қапшағай",value:"Везде и нигде"},{label:"Опаздывает",value:"Всегда"},{label:"Энергия",value:"9000+"},{label:"Роль",value:"Boss"}],
+    trackName:"Шадэ.mp3", songTitle:"Под Шадэ", artist:"By_Индия, Xcho, МОТ",
+    lyrics:"Она танцует под шаде\nТанцы прямо на мне\nТанцы прямо во тьме\nЯ знаю, что ты не в себе\n\nО чем эти голоса\nПоют в ее голове\nПомнишь ли ты пароли\nПомнишь ли свой викенд\n\nДа любит танцы\nЛюбит винтаж\nЗнает мой адрес\n5 этаж\n\nЕё парфюм ночи Милана\nНа мне костюм типа Сопрано\nЖди меня там у ресторана\nБэйб давай без обмана"
+  },
+  {
+    firstName:"Aktumar", lastName:"DOSMAILOVA", role:"Queen",
+    quote:"Красота — это не внешность, это состояние души",
+    vibes:["Aesthetic","Vibes","Style"], color:"#f0a0c0",
+    photo:"photo/Aktu.jpg",
+    bgGradient:"linear-gradient(145deg,#1a0818 0%,#300a28 50%,#4a0838 100%)",
+    birthday:"26 апреля 2002", zodiac:"♉ Телец",
+    galleryBg:["url('photo/Aktumar1.jpg') center/cover no-repeat","url('photo/Aktumar3.jpg') center/cover no-repeat","url('photo/Aktumar2.jpg') center/cover no-repeat"],
+    meme:"Я не опаздываю — я создаю ожидание.",
+    stats:[{label:"На Қапшағай",value:"Королева пляжа"},{label:"Стиль",value:"Always"},{label:"Настрой",value:"∞"},{label:"Роль",value:"Queen"}],
+    trackName:"I_Can_Believe_Shiza.mp3", songTitle:"I Can Believe", artist:"Shiza, Yenlik",
+    lyrics:"Sometimes I feel you are my dream\nI see, I know, you like it\nSometimes I feel, I bet, you see love in my eyes\nI like it\n\nI can believe\nI can believe\nI can believe in you\nI know that you believe in me"
+  },
+  {
+    firstName:"Duman", lastName:"BAKYTKALI", role:"Энергия",
+    quote:"Лето создано для тех, кто умеет жить",
+    vibes:["Energy","Sun","Beach"], color:"#f0c040",
+    photo:"photo/duman.jpg",
+    bgGradient:"linear-gradient(145deg,#1a1400 0%,#2a2200 50%,#403400 100%)",
+    birthday:"7 августа 2002", zodiac:"♌ Лев",
+    galleryBg:["url('photo/Duman2.jpg') center/cover no-repeat","url('photo/Duman1.jpg') center/cover no-repeat","url('photo/Duman3.jpg') center/cover no-repeat"],
+    meme:"Все спят — я уже на пляже.",
+    stats:[{label:"На Қапшағай",value:"Первым в воду"},{label:"Просыпается",value:"5am"},{label:"Энергия",value:"Solar"},{label:"Роль",value:"Хайп"}],
+    trackName:"Maqta Qyz.mp3", songTitle:"Maqta Qyz", artist:"Gassyr & Qanat",
+    lyrics:"Гүл алып үй жағыңа барсам болама\nБарғанда жүрмей мекен әкен аулада\nМен сені алып қашып кетсем ауылға\nҮй ішім біздер үшін дайындалуда\n\nДайынмын менде жаным сені алуға\nАнама әп-әдемі келін болуға\nЕй ауылға\nЖүр ауылға"
+  },
+  {
+    firstName:"Akniet", lastName:"NAZARBAYEVA", role:"Атмосфера",
+    quote:"Счастье — это когда тебе хорошо и рядом свои",
+    vibes:["Chill","Vibe","Glow"], color:"#80d8a0",
+    photo:"photo/akon.jpg",
+    bgGradient:"linear-gradient(145deg,#081810 0%,#102a18 50%,#1a3a22 100%)",
+    birthday:"20 октября 2001", zodiac:"♎ Весы",
+    galleryBg:["url('photo/Akonya1.jpg') center/cover no-repeat","url('photo/Akonya2.jpg') center/cover no-repeat","url('photo/Akonya3.jpg') center/cover no-repeat"],
+    meme:"Главное — атмосфера. Остальное приложится.",
+    stats:[{label:"На Қапшағай",value:"Создаёт уют"},{label:"Настрой",value:"Zen"},{label:"Вайб",value:"Golden Hour"},{label:"Роль",value:"Сердце"}],
+    trackName:"Айыптама.mp3", songTitle:"Айыптама", artist:"Ninety one",
+    lyrics:"Бір ауыз сөзің маған айтқан сенің\nОрындалмай қалған кездері болмаған\nЖетеді төзім, еркелетіп келдім\nСені құшағымда\n\nМені айыптама!\nСенбе ғажайыптарға\nМен бәрібір өзгере алмаймын!"
+  },
+  {
+    firstName:"Abylai", lastName:"YBYRAYEV", role:"Водитель",
+    quote:"Дорога сама по себе — уже приключение",
+    vibes:["Road","Speed","Freedom"], color:"#e86060",
+    photo:"photo/Abl.jpg",
+    bgGradient:"linear-gradient(145deg,#140808 0%,#2a1010 50%,#420c0c 100%)",
+    birthday:"15 марта 2002", zodiac:"♓ Рыбы",
+    galleryBg:["url('photo/Ablylai1.jpg') center/cover no-repeat","url('photo/Ablylai2.jpg') center/cover no-repeat","url('photo/Ablylai3.jpg') center/cover no-repeat"],
+    meme:"GPS говорит — налево. Я говорю — нет.",
+    stats:[{label:"На Қапшағай",value:"За рулём"},{label:"Скорость",value:"Max"},{label:"Плейлист",value:"Hard"},{label:"Роль",value:"Пилот"}],
+    trackName:"Пах.mp3", songTitle:"Пах Пах Пах", artist:"Айқын Төлепберген",
+    lyrics:"Пах-пах-пах қандай ғажап иіс\nШат-шат-шат қиялыма ілес\nҚандай ыстық жүрегімнен сүйіс\nСозылған кірпігімнен күйіш"
+  },
+  {
+    firstName:"Aigerim", lastName:"OTZHAN", role:"Модель",
+    quote:"Каждый момент заслуживает быть запомненным",
+    vibes:["Photo","Art","Moments"], color:"#c0a0e8",
+    photo:"photo/aiko.jpg",
+    bgGradient:"linear-gradient(145deg,#100818 0%,#1c1030 50%,#2c1848 100%)",
+    birthday:"6 декабря 2001", zodiac:"♐ Стрелец",
+    galleryBg:["url('photo/Aigerim1.jpg') center/cover no-repeat","url('photo/Aigerim2.jpg') center/cover no-repeat","url('photo/Aigerim3.jpg') center/cover no-repeat"],
+    meme:"Подождите, я только сделаю ещё один кадр… последний.",
+    stats:[{label:"На Қапшағай",value:"Снимает всё"},{label:"Жанр",value:"Cinematic"},{label:"Батарея",value:"0%"},{label:"Роль",value:"Летописец"}],
+    trackName:"basqany.mp3", songTitle:"BASQANY", artist:"Ayau, Shiza",
+    lyrics:"Бәріде-бәріде есте\nБақытты кездер\nУақытта өтті лезде\nӨтті тәтті кез\n\nМен бәрін басқаша\nЕлестеттім алайда\nҚоштасудың уақыты\nТым ерте келді қалайша?"
+  }
+];
+
+// ── MEMORIES (прошлые поездки) ──
+// Добавь свои фото: photo: "photo/memories/foto1.jpg", caption: "Подпись"
+const memories = [
+  { photo:"photo/memories/photo1.jpg", caption:"Первый раз в поход" },
+  { photo:"photo/memories/photo2.jpg", caption:"Когда купили машину" },
+  { photo:"photo/memories/photo3.jpg", caption:"Аэрапорт" },
+  { photo:"photo/memories/photo4.jpg", caption:"Лето" },
+  { photo:"photo/memories/photo6.jpg", caption:"Общая сумасшедшая фотка" },
+  { photo:"photo/memories/photo7.jpg", caption:"День рождения Актумар" },
+  { photo:"photo/memories/photo8.jpg", caption:"Лето второе" },
+  { photo:"photo/memories/photo10.jpg", caption:"Бандиты" },
+  { photo:"photo/memories/photo11.jpg", caption:"Дорама" },
+  { photo:"photo/memories/photo12.jpg", caption:"Кино под открытым небом" }
+];
+
+
+window.addEventListener('scroll',()=>{
+  const el=document.getElementById('scroll-progress');
+  const tot=document.documentElement.scrollHeight-window.innerHeight;
+  if(tot>0)el.style.width=(window.scrollY/tot*100)+'%';
+});
+
+// ── LYRICS ──
+function openLyrics(idx){
+  const p=personas[idx];
+  document.getElementById('lSong').textContent=p.songTitle;
+  document.getElementById('lBy').textContent=p.artist;
+  document.getElementById('lBody').textContent=p.lyrics||'Текст не добавлен.';
+  document.getElementById('lyricsPanel').classList.add('open');
+}
+function closeLyrics(){document.getElementById('lyricsPanel').classList.remove('open');}
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('lyricsPanel');
+  if(panel.classList.contains('open')&&!panel.contains(e.target)&&!e.target.classList.contains('btn-lyrics-link'))closeLyrics();
+});
+
+// ── LIKES ──
+const likes={};
+function toggleLike(idx){
+  likes[idx]=!likes[idx];
+  const btn=document.getElementById('like'+idx);
+  btn.classList.toggle('liked',likes[idx]);
+  btn.textContent=likes[idx]?'♥':'♡';
+}
+
+// ── BIRTHDAY COUNTDOWN ──
+function bdayUntil(s){
+  const mo={января:0,февраля:1,марта:2,апреля:3,мая:4,июня:5,июля:6,августа:7,сентября:8,октября:9,ноября:10,декабря:11};
+  const p=s.split(' ');const d=parseInt(p[0]);const m=mo[p[1]?.toLowerCase()];
+  if(isNaN(d)||m===undefined)return'—';
+  const now=new Date();let nx=new Date(now.getFullYear(),m,d);
+  if(nx<now)nx.setFullYear(now.getFullYear()+1);
+  const days=Math.floor((nx-now)/86400000);
+  return days===0?'🎂 Сегодня!':days+' дн.';
+}
+
+// ── NEXT BIRTHDAY BANNER ──
+function initNextBday(){
+  const mo={января:0,февраля:1,марта:2,апреля:3,мая:4,июня:5,июля:6,августа:7,сентября:8,октября:9,ноября:10,декабря:11};
+  const now=new Date();let closest=null,minDays=Infinity;
+  personas.forEach(p=>{
+    if(!p.birthday)return;
+    const pts=p.birthday.split(' ');const d=parseInt(pts[0]),m=mo[pts[1]?.toLowerCase()];
+    if(isNaN(d)||m===undefined)return;
+    let nx=new Date(now.getFullYear(),m,d);if(nx<now)nx.setFullYear(now.getFullYear()+1);
+    const days=Math.floor((nx-now)/86400000);
+    if(days<minDays){minDays=days;closest=p;}
+  });
+  if(closest){
+    document.getElementById('nbbName').textContent=closest.firstName+' '+closest.lastName;
+    document.getElementById('nbbDays').textContent=minDays===0?'🎂':minDays;
+    if(minDays===0)document.getElementById('nbbLabel').textContent='Сегодня!';
+  }
+}
+
+// ── GALLERY ──
+const galState={};
+function galMove(idx,dir){
+  const p=personas[idx];const count=(p.gallery||p.galleryBg||[]).length;
+  if(!galState[idx])galState[idx]=0;
+  galState[idx]=(galState[idx]+dir+count)%count;
+  updateGal(idx);
+}
+function galGoto(idx,s){galState[idx]=s;updateGal(idx);}
+function updateGal(idx){
+  const cur=galState[idx]||0;const p=personas[idx];const count=(p.gallery||p.galleryBg||[]).length;
+  const tr=document.getElementById('gtrack'+idx);const cn=document.getElementById('gcnt'+idx);
+  if(tr)tr.style.transform=`translateX(-${cur*100}%)`;
+  if(cn)cn.textContent=(cur+1)+' / '+count;
+  document.querySelectorAll('#gdots'+idx+' .gallery-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+}
+
+// ── GUESTBOOK ──
+const gbEntries=[];
+function addGbEntry(){
+  const name=document.getElementById('gbName').value.trim();
+  const text=document.getElementById('gbText').value.trim();
+  const emoji=document.getElementById('gbEmoji').value;
+  if(!name||!text)return;
+  gbEntries.unshift({name,text,emoji,time:new Date()});
+  document.getElementById('gbName').value='';
+  document.getElementById('gbText').value='';
+  renderGb();
+}
+function renderGb(){
+  const el=document.getElementById('gbEntries');
+  if(!gbEntries.length){el.innerHTML='<div class="gb-empty">Будь первым — оставь пожелание ✨</div>';return;}
+  el.innerHTML=gbEntries.map(e=>`
+    <div class="gb-entry">
+      <div class="gb-entry-head">
+        <span class="gb-entry-emoji">${e.emoji}</span>
+        <span class="gb-entry-name">${e.name}</span>
+        <span class="gb-entry-time">${e.time.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>
+      <div class="gb-entry-text">${e.text}</div>
+    </div>`).join('');
+}
+
+// ── TYPEWRITER ──
+const twDone={};
+function typewriterStart(el,text){
+  const id=el.dataset.twId;
+  if(twDone[id])return;
+  twDone[id]=true;
+  el.innerHTML='';
+  const cursor=document.createElement('span');
+  cursor.className='tw-cursor';
+  el.appendChild(cursor);
+  let i=0;
+  (function tick(){
+    if(i<text.length){el.insertBefore(document.createTextNode(text[i++]),cursor);setTimeout(tick,22+Math.random()*26);}
+  })();
+}
+
+// ── SMOKE ──
+function addSmoke(col){
+  const wrap=document.createElement('div');wrap.className='smoke-wrap';
+  for(let i=0;i<5;i++){
+    const s=document.createElement('div');s.className='smoke';
+    const sz=80+Math.random()*120;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*80}%;bottom:${Math.random()*30}%;animation-duration:${9+Math.random()*9}s;animation-delay:${Math.random()*5}s`;
+    wrap.appendChild(s);
+  }
+  col.appendChild(wrap);
+}
+
+// ── VISUALIZER ──
+const analyserMap={},vizFrames={};
+function createAnalyser(audio,idx){
+  try{
+    if(analyserMap[idx])return analyserMap[idx];
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const src=ctx.createMediaElementSource(audio);
+    const an=ctx.createAnalyser();an.fftSize=64;
+    src.connect(an);an.connect(ctx.destination);
+    analyserMap[idx]=an;return an;
+  }catch(e){return null;}
+}
+function startVisualizer(idx,audio){
+  const el=document.getElementById('viz'+idx);if(!el)return;
+  el.classList.add('active');
+  const an=createAnalyser(audio,idx);if(!an)return;
+  const bars=el.querySelectorAll('.vbar');
+  const data=new Uint8Array(an.frequencyBinCount);
+  (function draw(){
+    if(activeScrollIdx!==idx){el.classList.remove('active');return;}
+    vizFrames[idx]=requestAnimationFrame(draw);
+    an.getByteFrequencyData(data);
+    bars.forEach((b,i)=>{const v=data[Math.floor(i*data.length/bars.length)]/255;b.style.height=Math.max(3,v*28)+'px';});
+  })();
+}
+function stopVisualizer(idx){
+  const el=document.getElementById('viz'+idx);if(el)el.classList.remove('active');
+  if(vizFrames[idx]){cancelAnimationFrame(vizFrames[idx]);delete vizFrames[idx];}
+}
+
+// ── TRACK NAME ANIMATION (Spotify) ──
+function animateTrackName(idx,name,artist){
+  const el=document.getElementById('tname'+idx);if(!el)return;
+  const cur=el.querySelector('.track-name.visible');
+  const next=document.createElement('div');
+  next.className='track-name entering';
+  next.textContent='♪  '+name+(artist&&artist!=='—'?'  —  '+artist:'');
+  el.appendChild(next);
+  requestAnimationFrame(()=>{
+    if(cur)cur.classList.replace('visible','leaving');
+    requestAnimationFrame(()=>next.classList.replace('entering','visible'));
+  });
+  setTimeout(()=>cur?.remove(),500);
+}
+
+// ── TRACK PROGRESS BAR ──
+let progressIv=null;
+function startTrackProgress(idx,audio){
+  clearInterval(progressIv);
+  const fill=document.getElementById('tprog'+idx);if(!fill)return;
+  progressIv=setInterval(()=>{
+    if(!audio.duration)return;
+    fill.style.width=(audio.currentTime/audio.duration*100)+'%';
+  },500);
+}
+
+// ── SCROLL MUSIC ──
+const scrollAudios={};
+let activeScrollIdx=-1;
+function getScrollAudio(t){
+  if(!scrollAudios[t]){const a=new Audio(t);a.loop=true;a.volume=0;scrollAudios[t]=a;}
+  return scrollAudios[t];
+}
+function scrollFadeIn(a,vol=.6,ms=1400){
+  a.play().catch(()=>{});
+  const s=vol/(ms/40);
+  const iv=setInterval(()=>{a.volume=Math.min(a.volume+s,vol);if(a.volume>=vol)clearInterval(iv);},40);
+}
+function scrollFadeOut(a,ms=1000){
+  const s=a.volume/(ms/40);
+  const iv=setInterval(()=>{a.volume=Math.max(a.volume-s,0);if(a.volume<=0){a.pause();clearInterval(iv);}},40);
+}
+
+function toggleTrack(idx){
+  const p=personas[idx];const a=getScrollAudio(p.trackName);
+  if(activeScrollIdx===idx&&!a.paused){
+    scrollFadeOut(a);stopVisualizer(idx);clearInterval(progressIv);
+    activeScrollIdx=-1;
+    document.getElementById('npText').textContent='NO TRACK';
+    document.querySelectorAll('.btn-play').forEach(b=>{b.classList.remove('active');b.querySelector('.bars').style.display='none';});
+    return;
+  }
+  if(activeScrollIdx>=0&&personas[activeScrollIdx]?.trackName){
+    scrollFadeOut(getScrollAudio(personas[activeScrollIdx].trackName));
+    stopVisualizer(activeScrollIdx);
+  }
+  activeScrollIdx=idx;
+  scrollFadeIn(a);
+  startVisualizer(idx,a);
+  animateTrackName(idx,p.songTitle,p.artist);
+  startTrackProgress(idx,a);
+  document.getElementById('npText').textContent=p.songTitle+' — '+p.artist;
+  document.querySelectorAll('.btn-play').forEach((b,i)=>{
+    b.classList.toggle('active',i===idx);
+    b.querySelector('.bars').style.display=i===idx?'flex':'none';
+  });
+}
+
+function initScrollMusic(){
+  const slides=document.querySelectorAll('.persona-slide');
+  slides.forEach((slide,i)=>{
+    const p=personas[i];if(!p||!p.trackName)return;
+    // Smoke
+    const col=slide.querySelector('.persona-photo-col');
+    if(col)addSmoke(col);
+    // Quote el for typewriter
+    const qEl=slide.querySelector('.p-quote');
+    if(qEl)qEl.dataset.twId=i;
+
+    new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting&&activeScrollIdx!==i){
+          if(activeScrollIdx>=0&&personas[activeScrollIdx]?.trackName){
+            scrollFadeOut(getScrollAudio(personas[activeScrollIdx].trackName));
+            stopVisualizer(activeScrollIdx);
+          }
+          activeScrollIdx=i;
+          const audio=getScrollAudio(p.trackName);
+          scrollFadeIn(audio);
+          startVisualizer(i,audio);
+          animateTrackName(i,p.songTitle,p.artist);
+          startTrackProgress(i,audio);
+          document.getElementById('npText').textContent=p.songTitle+' — '+p.artist;
+          document.querySelectorAll('.btn-play').forEach((b,bi)=>{
+            b.classList.toggle('active',bi===i);
+            b.querySelector('.bars').style.display=bi===i?'flex':'none';
+          });
+          // Typewriter
+          if(qEl)typewriterStart(qEl,p.quote);
+        }
+      });
+    },{threshold:.4}).observe(slide);
+  });
+
+  // Fade out when leaving personas section
+  new IntersectionObserver((entries)=>{
+    if(!entries[0].isIntersecting&&activeScrollIdx>=0&&personas[activeScrollIdx]?.trackName){
+      scrollFadeOut(getScrollAudio(personas[activeScrollIdx].trackName));
+      stopVisualizer(activeScrollIdx);
+      clearInterval(progressIv);
+      document.getElementById('npText').textContent='NO TRACK';
+      document.querySelectorAll('.btn-play').forEach(b=>{b.classList.remove('active');b.querySelector('.bars').style.display='none';});
+      activeScrollIdx=-1;
+    }
+  },{threshold:0}).observe(document.getElementById('personas'));
+}
+
+// ── RENDER ──
+function render(){
+  const wrap=document.getElementById('personasWrap');
+  const roster=document.getElementById('rosterEl');
+  document.getElementById('countVal').textContent=personas.length+' человек';
+
+  personas.forEach((p,i)=>{
+    const slide=document.createElement('div');
+    slide.className='persona-slide';
+    slide.style.setProperty('--p-color',p.color);
+
+    const photoBg=p.photo
+      ?`background-image:url('${p.photo}');background-size:cover;background-position:center top`
+      :`background:${p.bgGradient}`;
+    const phPh=p.photo?'':`<div class="persona-ph-placeholder"><div class="ph-num">${String(i+1).padStart(2,'0')}</div><div class="ph-lbl">[ Photo ${i+1} ]</div></div>`;
+
+    const statsHtml=(p.stats||[]).map(s=>`<div class="stat-item"><div class="stat-lbl">${s.label}</div><div class="stat-val">${s.value}</div></div>`).join('');
+
+    const bdayHtml=p.birthday?`<div class="p-birthday">
+      <div class="bday-left"><div class="bday-label">День рождения</div><div class="bday-date">${p.birthday}</div></div>
+      <div class="bday-sign">${(p.zodiac||'').split(' ')[0]||'🎂'}</div>
+      <div class="bday-right"><div class="bday-until-label">До ДР</div><div class="bday-until-val">${bdayUntil(p.birthday)}</div></div>
+    </div>`:'';
+
+    const galSrc=p.gallery||p.galleryBg||[];
+    const galHtml=galSrc.length?`
+      <div class="p-gallery">
+        <div class="gallery-track" id="gtrack${i}">
+          ${galSrc.map((src,gi)=>{
+            const isPhoto=p.gallery&&p.gallery[gi];
+            const st=isPhoto?`background-image:url('${src}');background-size:cover;background-position:center`:`background:${src}`;
+            return`<div class="gallery-slide" style="${st}">
+              ${!isPhoto?`<div class="gallery-slide-placeholder"><div class="gph-num">${gi+1}</div><div class="gph-lbl">gallery · ${gi+1}</div></div>`:''}
+              <div class="gallery-overlay"></div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="gallery-counter" id="gcnt${i}">1 / ${galSrc.length}</div>
+        <button class="gallery-nav gallery-prev" onclick="galMove(${i},-1)">‹</button>
+        <button class="gallery-nav gallery-next" onclick="galMove(${i},1)">›</button>
+      </div>
+      <div class="gallery-dots" id="gdots${i}">
+        ${galSrc.map((_,gi)=>`<div class="gallery-dot${gi===0?' active':''}" onclick="galGoto(${i},${gi})"></div>`).join('')}
+      </div>`:'';
+
+    const memeHtml=p.meme?`<div class="p-meme">
+      <div class="meme-icon">💬</div>
+      <div class="meme-label">Любимая фраза</div>
+      <div class="meme-text">${p.meme}</div>
+    </div>`:'';
+
+    slide.innerHTML=`
+      <div class="persona-photo-col">
+        <div class="persona-photo-inner" style="${photoBg}">${phPh}</div>
+        <div class="photo-vignette"></div>
+      </div>
+      <div class="persona-info-col">
+        <div class="p-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="p-lastname">${p.lastName}</div>
+        <div class="p-firstname">${p.firstName}</div>
+        <div class="p-role">${p.role}</div>
+        <div class="p-quote" data-tw-id="${i}">${p.quote}</div>
+        ${p.stats?`<div class="p-stats">${statsHtml}</div>`:''}
+        ${bdayHtml}
+        ${galHtml}
+        ${memeHtml}
+        <div class="p-vibes">${p.vibes.map(v=>`<span class="vibe-tag">${v}</span>`).join('')}</div>
+        <div class="p-actions">
+          <button class="btn-play" onclick="toggleTrack(${i})">
+            <div class="bars" style="display:none"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+            ♪ Трек
+          </button>
+          <button class="btn-lyrics-link" onclick="openLyrics(${i})">[ Текст ]</button>
+          <button class="like-btn" id="like${i}" onclick="toggleLike(${i})">♡</button>
+        </div>
+        <div class="visualizer" id="viz${i}">
+          ${Array.from({length:12},()=>`<div class="vbar" style="height:${3+Math.random()*12}px"></div>`).join('')}
+        </div>
+        <div class="track-display" id="tname${i}">
+          <div class="track-name visible">♪  ${p.songTitle} — ${p.artist}</div>
+        </div>
+        <div class="track-progress">
+          <div class="track-progress-fill" id="tprog${i}"></div>
+        </div>
+      </div>`;
+
+    wrap.appendChild(slide);
+    if(i<personas.length-1){const d=document.createElement('div');d.className='persona-divider';wrap.appendChild(d);}
+
+    const nm=document.createElement('span');nm.className='roster-name';
+    nm.textContent=p.firstName+' '+p.lastName;nm.style.color=p.color;
+    roster.appendChild(nm);
+    if(i<personas.length-1){const dot=document.createElement('span');dot.className='roster-dot';dot.textContent='·';roster.appendChild(dot);}
+  });
+}
+
+// ── STARS & PARTICLES ──
+function stars(){
+  const c=document.getElementById('starsWrap');
+  for(let i=0;i<90;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2+.4;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${Math.random()*4+2}s;animation-delay:${Math.random()*5}s`;
+    c.appendChild(s);
+  }
+}
+function parts(){
+  const c=document.getElementById('partsWrap');
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');p.className='particle';
+    p.style.cssText=`left:${Math.random()*100}%;animation-duration:${Math.random()*12+8}s;animation-delay:${Math.random()*8}s`;
+    c.appendChild(p);
+  }
+}
+
+// ── MEMORIES RENDER ──
+function renderMemories(){
+  const grid=document.getElementById('memGrid');
+  const gradients=[
+    'linear-gradient(145deg,#1a1060,#2d1a80)','linear-gradient(145deg,#102a18,#1a3a22)',
+    'linear-gradient(145deg,#2a1010,#420c0c)','linear-gradient(145deg,#2a1808,#422808)',
+    'linear-gradient(145deg,#200a38,#380c60)','linear-gradient(145deg,#041c2c,#062840)'
+  ];
+  memories.forEach((m,i)=>{
+    const card=document.createElement('div');card.className='mem-card';
+    if(m.photo){
+      card.style.backgroundImage=`url('${m.photo}')`;
+      card.innerHTML=`<div class="mem-overlay"><div class="mem-overlay-text">${m.caption||''}</div></div>`;
+    } else {
+      card.style.background=gradients[i%gradients.length];
+      card.innerHTML=`<div class="mem-card-placeholder"><div class="mem-ph-icon">📷</div><div class="mem-ph-lbl">memory · ${i+1}</div></div><div class="mem-overlay"><div class="mem-overlay-text">${m.caption||''}</div></div>`;
+    }
+    grid.appendChild(card);
+  });
+}
+
+// ── WEATHER (Open-Meteo, без ключа) ──
+// Координаты Қапшағай
+const QAPSHAGAI_LAT=43.85, QAPSHAGAI_LON=77.07;
+const weatherIcons={
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+const weatherDescriptions={
+  0:'Ясно',1:'Преимущественно ясно',2:'Переменная облачность',3:'Облачно',
+  45:'Туман',48:'Туман с инеем',51:'Лёгкая морось',53:'Морось',55:'Сильная морось',
+  61:'Небольшой дождь',63:'Дождь',65:'Сильный дождь',
+  71:'Небольшой снег',73:'Снег',75:'Сильный снег',
+  80:'Ливни',81:'Сильные ливни',82:'Очень сильные ливни',
+  95:'Гроза',96:'Гроза с градом',99:'Сильная гроза с градом'
+};
+
+async function loadWeather(){
+  try{
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${QAPSHAGAI_LAT}&longitude=${QAPSHAGAI_LON}&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FAlmaty`;
+    const res=await fetch(url);
+    const data=await res.json();
+    const cur=data.current;
+    const code=cur.weather_code;
+    const icon=weatherIcons[code]||'🌤️';
+    const desc=weatherDescriptions[code]||'—';
+    document.getElementById('weatherIcon').textContent=icon;
+    document.getElementById('weatherTemp').textContent=Math.round(cur.temperature_2m)+'°C';
+    document.getElementById('weatherDesc').textContent=desc+' · сейчас';
+    const maxT=Math.round(data.daily.temperature_2m_max[0]);
+    const minT=Math.round(data.daily.temperature_2m_min[0]);
+    document.getElementById('weatherExtra').innerHTML=
+      `Макс: <span>${maxT}°C</span><br>Мин: <span>${minT}°C</span><br>Ветер: <span>${Math.round(cur.wind_speed_10m)} км/ч</span><br>Влажность: <span>${cur.relative_humidity_2m}%</span>`;
+  }catch(e){
+    document.getElementById('weatherTemp').innerHTML='<span class="weather-loading">Не удалось загрузить</span>';
+    document.getElementById('weatherDesc').textContent='Проверь подключение к интернету';
+  }
+}
+
+
+function cd(){
+  const diff=TRIP_DATE-new Date();
+  document.getElementById('cdVal').textContent=diff<=0?'Уже едем!':Math.floor(diff/86400000)+' дней';
+}
+
+// ── INIT ──
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('intro').classList.add('hidden');
+    setTimeout(initScrollMusic,400);
+  },2300);
+});
+
+stars();parts();render();cd();initNextBday();renderMemories();loadWeather();
+</script>
+</body>
+</html>
